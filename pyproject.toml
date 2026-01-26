@@ -1,18 +1,18 @@
 [project]
 name = "ron-py"
 version = "0.1.0"
-description = "Add your description here"
+description = "Python reader for Rusty Object Notation"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "antlr4-python3-runtime>=4.13.2",
-    "types-antlr4-python3-runtime>=4.13.0.20251118",
 ]
 
 [dependency-groups]
 dev = [
     "antlr4-tools>=0.2.2",
     "mypy>=1.19.1",
+    "types-antlr4-python3-runtime>=4.13.0.20251118",
 ]
 
 [tool.basedpyright]
@@ -26,3 +26,7 @@ exclude = ["ron_parser/"]
 python_version = 3.14
 warn_unused_configs = true
 check_untyped_defs = true
+
+[tool.ruff]
+line-length = 80
+extend-exclude = ['ron_parser/']

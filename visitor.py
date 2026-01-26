@@ -22,7 +22,7 @@ class RonConverter(RonVisitor):
         body = struct_ctx.struct_body()
 
         if body is None:
-            return RonStruct(name=name, fields=[])
+            return RonStruct(name=name, _fields=[])
 
         if body.named_fields():
             fields: dict[str, RonValue] = {}
@@ -30,15 +30,15 @@ class RonConverter(RonVisitor):
                 key = field.IDENTIFIER().getText()
                 val = cast(RonValue, self.visit(field.value()))
                 fields[key] = val
-            return RonStruct(name=name, fields=fields)
+            return RonStruct(name=name, _fields=fields)
 
         elif body.unnamed_fields():
             fields_list: list[RonValue] = []
             for val_ctx in body.unnamed_fields().value():
                 fields_list.append(cast(RonValue, self.visit(val_ctx)))
-            return RonStruct(name=name, fields=fields_list)
+            return RonStruct(name=name, _fields=fields_list)
 
-        return RonStruct(name=name, fields=[])
+        return RonStruct(name=name, _fields=[])
 
     def visitMapValue(self, ctx: RonParser.MapValueContext) -> RonMap:
         map_ctx = ctx.ron_map()

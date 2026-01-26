@@ -28,8 +28,8 @@ if __name__ == "__main__":
         pprint(result)
 
         print("\n--- Access Check ---")
-        entities = result.fields["entities"].entries
-        hero_meta = entities["hero"].fields["meta"]
+        entities = result["entities"]
+        hero_meta = entities["hero"]["meta"]
         print(f"Hero Meta: {hero_meta}")
 
     except Exception as e:

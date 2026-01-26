@@ -1,6 +1,6 @@
 from antlr4 import CommonTokenStream, InputStream
 
-from models import RonValue
+from models import RonObject
 from ron_parser.RonLexer import RonLexer  # type: ignore
 from ron_parser.RonParser import RonParser  # type: ignore
 from visitor import RonConverter
@@ -10,7 +10,7 @@ class RonSyntaxError(Exception):
     pass
 
 
-def parse_ron(data: str) -> RonValue:
+def parse_ron(data: str) -> RonObject:
     """
     Парсить рядок у форматі RON і повертає структуру Python об'єктів.
     """
@@ -24,4 +24,4 @@ def parse_ron(data: str) -> RonValue:
         raise RonSyntaxError("Failed to parse RON data: Syntax Error")
 
     visitor = RonConverter()
-    return visitor.visit(tree)
+    return RonObject(visitor.visit(tree))
