@@ -11,5 +11,8 @@ build:
 run:
 	uv run main.py
 
+typecheck:
+	uv run mypy .
+
 clean:
 	rm -rf ron_parser/*

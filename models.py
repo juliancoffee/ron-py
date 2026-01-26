@@ -16,27 +16,27 @@ type RonValue = (
 )
 
 
-@dataclass
+@dataclass(frozen=True)
 class RonStruct:
     name: str
     fields: dict[str, RonValue] | list[RonValue]
 
 
-@dataclass
+@dataclass(frozen=True)
 class RonTuple:
     elements: list[RonValue]
 
 
-@dataclass
+@dataclass(frozen=True)
 class RonMap:
     entries: dict[RonValue, RonValue]
 
 
-@dataclass
+@dataclass(frozen=True)
 class RonOptional:
     value: RonValue | None
 
 
-@dataclass
+@dataclass(frozen=True)
 class RonChar:
     value: str
