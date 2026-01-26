@@ -1,5 +1,7 @@
 from typing import cast
 
+from frozendict import frozendict
+
 from models import RonChar, RonMap, RonOptional, RonStruct, RonTuple, RonValue
 from ron_parser.RonParser import RonParser  # type: ignore
 from ron_parser.RonVisitor import RonVisitor  # type: ignore
@@ -9,7 +11,9 @@ class RonConverter(RonVisitor):
     def visitRoot(self, ctx: RonParser.RootContext) -> RonValue:
         return cast(RonValue, self.visit(ctx.value()))
 
-    def visitOptionValue(self, ctx: RonParser.OptionValueContext) -> RonOptional:
+    def visitOptionValue(
+        self, ctx: RonParser.OptionValueContext
+    ) -> RonOptional:
         opt_ctx = ctx.option()
         if opt_ctx.NONE():
             return RonOptional(value=None)
@@ -22,23 +26,23 @@ class RonConverter(RonVisitor):
         body = struct_ctx.struct_body()
 
         if body is None:
-            return RonStruct(name=name, _fields=[])
+            return RonStruct(name=name, _fields=tuple())
 
         if body.named_fields():
-            fields: dict[str, RonValue] = {}
+            fields: dict[RonValue, RonValue] = {}
             for field in body.named_fields().named_field():
                 key = field.IDENTIFIER().getText()
                 val = cast(RonValue, self.visit(field.value()))
                 fields[key] = val
-            return RonStruct(name=name, _fields=fields)
+            return RonStruct(name=name, _fields=frozendict() | fields)
 
         elif body.unnamed_fields():
             fields_list: list[RonValue] = []
             for val_ctx in body.unnamed_fields().value():
                 fields_list.append(cast(RonValue, self.visit(val_ctx)))
-            return RonStruct(name=name, _fields=fields_list)
+            return RonStruct(name=name, _fields=tuple(fields_list))
 
-        return RonStruct(name=name, _fields=[])
+        return RonStruct(name=name, _fields=tuple())
 
     def visitMapValue(self, ctx: RonParser.MapValueContext) -> RonMap:
         map_ctx = ctx.ron_map()
@@ -47,18 +51,21 @@ class RonConverter(RonVisitor):
             key = cast(RonValue, self.visit(entry.value(0)))
             val = cast(RonValue, self.visit(entry.value(1)))
             entries[key] = val
-        return RonMap(entries=entries)
+        return RonMap(entries=frozendict() | entries)
 
     def visitTupleValue(self, ctx: RonParser.TupleValueContext) -> RonTuple:
         tuple_ctx = ctx.ron_tuple()
-        elements = [cast(RonValue, self.visit(v)) for v in tuple_ctx.value()]
+        elements = tuple(self.visit(v) for v in tuple_ctx.value())
+        elements = cast(tuple[RonValue], elements)
         return RonTuple(elements=elements)
 
-    def visitListValue(self, ctx: RonParser.ListValueContext) -> list[RonValue]:
+    def visitListValue(
+        self, ctx: RonParser.ListValueContext
+    ) -> tuple[RonValue]:
         list_ctx = ctx.ron_list()
         if not list_ctx.value():
-            return []
-        return [cast(RonValue, self.visit(v)) for v in list_ctx.value()]
+            return tuple()
+        return tuple(cast(RonValue, self.visit(v)) for v in list_ctx.value())
 
     # --- Примітиви ---
 

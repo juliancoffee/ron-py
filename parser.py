@@ -17,10 +17,10 @@ def parse_ron(data: str) -> RonObject:
     input_stream = InputStream(data)
     lexer = RonLexer(input_stream)
     stream = CommonTokenStream(lexer)
-    stream.fill()
-
-    for token in stream.tokens:
-        print(f"Token: {token.type} -> '{token.text}'")
+    # stream.fill()
+    #
+    # for token in stream.tokens:
+    #     print(f"Token: {token.type} -> '{token.text}'")
     parser = RonParser(stream)
     tree = parser.root()
 

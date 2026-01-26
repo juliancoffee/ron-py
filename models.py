@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from frozendict import frozendict
+
 type RonValue = (
     RonStruct
     | RonTuple
@@ -12,7 +14,7 @@ type RonValue = (
     | float
     | str
     | bool
-    | list["RonValue"]
+    | tuple["RonValue"]
 )
 
 
@@ -68,9 +70,9 @@ class RonObject:
 
         result: RonValue
 
-        if isinstance(container, dict):
+        if isinstance(container, frozendict):
             result = container[item]  # type: ignore
-        elif isinstance(container, list):
+        elif isinstance(container, tuple):
             if not isinstance(item, int):
                 raise TypeError(
                     f"List indices must be integers, got {type(item).__name__}"
@@ -87,21 +89,21 @@ class RonObject:
 @dataclass(frozen=True)
 class RonStruct:
     name: str
-    _fields: dict[str, RonValue] | list[RonValue]
+    _fields: frozendict[str, RonValue] | list[RonValue]
 
     @property
-    def as_dict(self) -> dict[str, RonValue]:
+    def as_dict(self) -> frozendict[str, RonValue]:
         """Return dict or die"""
-        if isinstance(self._fields, dict):
+        if isinstance(self._fields, frozendict):
             return self._fields
         raise ValueError(
             f"Struct '{self.name}' is a Tuple-Struct, not a Named-Struct"
         )
 
     @property
-    def as_list(self) -> list[RonValue]:
+    def as_list(self) -> tuple[RonValue]:
         """Return tuple or die"""
-        if isinstance(self._fields, list):
+        if isinstance(self._fields, tuple):
             return self._fields
         raise ValueError(
             f"Struct '{self.name}' is a Named-Struct, not a Tuple-Struct"
@@ -110,12 +112,12 @@ class RonStruct:
 
 @dataclass(frozen=True)
 class RonTuple:
-    elements: list[RonValue]
+    elements: tuple[RonValue]
 
 
 @dataclass(frozen=True)
 class RonMap:
-    entries: dict[RonValue, RonValue]
+    entries: frozendict[RonValue, RonValue]
 
 
 @dataclass(frozen=True)
