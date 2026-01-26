@@ -9,6 +9,7 @@ root
 value
     : option                    # OptionValue
     | ron_struct                # StructValue
+    | ron_anon_struct           # StructValue
     | ron_map                   # MapValue
     | ron_tuple                 # TupleValue
     | ron_list                  # ListValue
@@ -23,6 +24,15 @@ value
 option
     : SOME '(' value ')'
     | NONE
+    ;
+
+// Anon Structs: (a: 5, b: 7)
+ron_anon_struct
+    : IDENTIFIER? ( '(' strict_struct_body ')' )
+    ;
+
+strict_struct_body
+    : named_fields
     ;
 
 // Structs: Unit (Name), Tuple-like (Name(a, b)), Named (Name(a:1, b:2))

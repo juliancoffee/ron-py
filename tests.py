@@ -229,6 +229,21 @@ def test_empty_structures():
     assert struct._fields == ()
 
 
+def test_anon_struct():
+    obj = parse_ron("""
+    // comment comment
+    (
+        a: Item("path.to.item"),
+        b: Item("path.to.other.item"),
+    )
+    """)
+    struct = obj.expect_struct()
+    assert struct.name is None
+    assert struct._fields["a"] == RonStruct("Item", ("path.to.item",))
+    assert struct._fields["b"] == RonStruct("Item", ("path.to.other.item",))
+    assert len(struct._fields) == 2
+
+
 def test_type_mismatches():
     obj = parse_ron("User(age: 42)")
 

@@ -21,9 +21,14 @@ class RonConverter(RonVisitor):
         return RonOptional(value=inner_value)
 
     def visitStructValue(self, ctx: RonParser.StructValueContext) -> RonStruct:
-        struct_ctx = ctx.ron_struct()
-        name = struct_ctx.IDENTIFIER().getText()
-        body = struct_ctx.struct_body()
+        if ctx.ron_struct() is not None:
+            struct_ctx = ctx.ron_struct()
+            name = struct_ctx.IDENTIFIER().getText()
+            body = struct_ctx.struct_body()
+        elif ctx.ron_anon_struct() is not None:
+            struct_ctx = ctx.ron_anon_struct()
+            name = None
+            body = struct_ctx.strict_struct_body()
 
         if body is None:
             return RonStruct(name=name, _fields=tuple())

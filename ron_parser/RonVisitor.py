@@ -70,6 +70,16 @@ class RonVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by RonParser#ron_anon_struct.
+    def visitRon_anon_struct(self, ctx:RonParser.Ron_anon_structContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by RonParser#strict_struct_body.
+    def visitStrict_struct_body(self, ctx:RonParser.Strict_struct_bodyContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by RonParser#ron_struct.
     def visitRon_struct(self, ctx:RonParser.Ron_structContext):
         return self.visitChildren(ctx)
