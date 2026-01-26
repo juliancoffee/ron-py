@@ -89,4 +89,7 @@ class RonConverter(RonVisitor):
             return raw_text[1:-1].encode("utf-8").decode("unicode_escape")
 
     def visitCharValue(self, ctx: RonParser.CharValueContext) -> RonChar:
-        return RonChar(value=ctx.getText()[1:-1])
+        raw_text = ctx.getText()
+        encoded = raw_text[1:-1].encode("utf-8").decode("unicode_escape")
+
+        return RonChar(value=encoded)

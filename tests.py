@@ -4,7 +4,7 @@ from parser import parse_ron
 
 import pytest
 
-from models import RonObject, RonOptional, RonStruct, RonTuple
+from models import RonChar, RonMap, RonObject, RonOptional, RonStruct, RonTuple
 
 
 def test_primitives():
@@ -151,6 +151,27 @@ def test_strings_super_raw():
     assert obj.expect_str() == 'Contains "# hash'
 
 
+def test_raw_strings_multiple_hashes():
+    cases = [
+        (r'r"simple raw"', "simple raw"),
+        (r'r#"one hash"#', "one hash"),
+        (r'r##"two hashes"##', "two hashes"),
+        (r'r###"three hashes"###', "three hashes"),
+        (r'r####"four hashes"####', "four hashes"),
+    ]
+    for data, expected in cases:
+        assert parse_ron(data).expect_str() == expected
+
+
+def test_raw_strings_complex_content():
+    data = r'r##"Тут є "# одна решітка та ##"##'
+    assert parse_ron(data).expect_str() == 'Тут є "# одна решітка та ##'
+
+    data = r"""r#"Line 1
+Line 2"#"""
+    assert parse_ron(data).expect_str() == "Line 1\nLine 2"
+
+
 def test_numeric_formats():
     # Hex
     assert parse_ron("0xFF").expect_int() == 255
@@ -246,3 +267,104 @@ def test_option_some_none():
     assert val is None
 
     assert obj == RonObject(RonOptional(value=RonOptional(value=None)))
+
+
+def test_scientific_notation():
+    assert parse_ron("1.2e4").v == 12000.0
+    assert parse_ron("5e-2").v == 0.05
+    assert parse_ron("1e+3").v == 1000.0
+    assert parse_ron(".5").v == 0.5
+    assert parse_ron("42.").v == 42.0
+
+
+def test_char_literals():
+    assert parse_ron("'a'").v == RonChar("a")
+    assert parse_ron("'z'").v == RonChar("z")
+
+    assert parse_ron(r"'\n'").v == RonChar("\n")
+    assert parse_ron(r"'\t'").v == RonChar("\t")
+    assert parse_ron(r"'\''").v == RonChar("'")
+
+    assert parse_ron(r"'\u00AC'").v == RonChar("\u00ac")
+
+
+def test_multiline_strings():
+    data = """
+    "First line
+    Second line
+    Third line"
+    """
+    obj = parse_ron(data)
+    assert obj.expect_str() == "First line\n    Second line\n    Third line"
+
+
+def test_deep_nesting_complex():
+    data = r"""
+    Some([
+        {
+            (1, 2): User(
+                id: Some(42),
+                tags: ["rust", "python"],
+            ),
+        },
+    ])
+    """
+    obj = parse_ron(data)
+
+    # Розгортаємо "матрьошку"
+    inner_list = obj.into_option()
+    assert inner_list is not None
+
+    first_map = inner_list[0]
+
+    raw_map = first_map.v
+    assert isinstance(raw_map, RonMap)
+
+    key = list(raw_map.entries.keys())[0]
+    assert isinstance(key, RonTuple)
+    assert key.elements == (
+        1,
+        2,
+    )
+
+    user = first_map[key]
+    assert user["id"].into_option().expect_int() == 42
+    assert user["tags"][1].expect_str() == "python"
+
+
+def test_empty_with_comments():
+    # and I guess this tests unicode, lol
+
+    map_data = "{ /* коментар */ }"
+    list_data = "[ // порожньо \n ]"
+    tuple_data = "( \n /* нічого */ \n )"
+
+    assert len(parse_ron(map_data).v.entries) == 0
+    assert parse_ron(list_data).expect_list() == ()
+    assert parse_ron(tuple_data).expect_tuple().elements == ()
+
+
+def test_no_whitespace_parsing():
+    data = "[{1:User(id:1),2:User(id:2)},[Some(1),None]]"
+
+    obj = parse_ron(data)
+
+    map_part = obj[0]
+    entries = map_part.v.entries
+    assert 1 in entries
+
+    user1 = map_part[1]
+    assert user1.expect_struct().name == "User"
+    assert user1["id"].expect_int() == 1
+
+    list_part = obj[1]
+    assert list_part[0].into_option().expect_int() == 1
+    assert list_part[1].into_option() is None
+
+
+def test_dense_scientific_notation():
+    data = '{"val":-1.2e4,"next":.5}'
+    obj = parse_ron(data)
+
+    assert obj["val"].v == -12000.0
+    assert obj["next"].v == 0.5

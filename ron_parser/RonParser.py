@@ -76,7 +76,7 @@ class RonParser ( Parser ):
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "SOME", "NONE", "BOOLEAN", "IDENTIFIER", 
-                      "INTEGER", "FLOAT", "STRING", "CHAR", "WS", "COMMENT", 
+                      "FLOAT", "INTEGER", "STRING", "CHAR", "WS", "COMMENT", 
                       "BLOCK_COMMENT" ]
 
     RULE_root = 0
@@ -109,8 +109,8 @@ class RonParser ( Parser ):
     NONE=10
     BOOLEAN=11
     IDENTIFIER=12
-    INTEGER=13
-    FLOAT=14
+    FLOAT=13
+    INTEGER=14
     STRING=15
     CHAR=16
     WS=17
@@ -405,16 +405,16 @@ class RonParser ( Parser ):
                 self.match(RonParser.STRING)
                 pass
             elif token in [13]:
-                localctx = RonParser.IntValueContext(self, localctx)
+                localctx = RonParser.FloatValueContext(self, localctx)
                 self.enterOuterAlt(localctx, 8)
                 self.state = 34
-                self.match(RonParser.INTEGER)
+                self.match(RonParser.FLOAT)
                 pass
             elif token in [14]:
-                localctx = RonParser.FloatValueContext(self, localctx)
+                localctx = RonParser.IntValueContext(self, localctx)
                 self.enterOuterAlt(localctx, 9)
                 self.state = 35
-                self.match(RonParser.FLOAT)
+                self.match(RonParser.INTEGER)
                 pass
             elif token in [11]:
                 localctx = RonParser.BoolValueContext(self, localctx)

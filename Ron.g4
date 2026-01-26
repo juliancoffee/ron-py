@@ -14,8 +14,8 @@ value
     | ron_list                  # ListValue
     | CHAR                      # CharValue
     | STRING                    # StringValue
-    | INTEGER                   # IntValue
     | FLOAT                     # FloatValue
+    | INTEGER                   # IntValue
     | BOOLEAN                   # BoolValue
     ;
 
@@ -78,6 +78,13 @@ IDENTIFIER
     | 'r#' [a-zA-Z0-9_]+  // Raw identifier support
     ;
 
+FLOAT
+    : '-'? [0-9]* '.' [0-9]+ ([eE] [+-]? [0-9]+)?
+    | '-'? [0-9]+ '.' ([eE] [+-]? [0-9]+)?
+    | '-'? [0-9]+ [eE] [+-]? [0-9]+
+    | '-'? [0-9]+ '.' [0-9]+
+    ;
+
 INTEGER
     : '-'? ( '0' | [1-9] [0-9]* )
     | '0x' [0-9a-fA-F]+
@@ -85,17 +92,20 @@ INTEGER
     | '0o' [0-7]+
     ;
 
-FLOAT
-    : '-'? [0-9]+ '.' [0-9]+
-    ;
-
 STRING
-    : '"' ( ~["\\] | '\\' . )* '"'
-    | 'r' '#'* '"' .*? '"' '#'* // Raw string support
+    : 'r' '######"' .*? '"######'
+    | 'r' '#####"'  .*? '"#####'
+    | 'r' '####"'   .*? '"####'
+    | 'r' '###"'    .*? '"###'
+    | 'r' '##"'     .*? '"##'
+    | 'r' '#"'      .*? '"#'
+    | 'r"'          .*? '"'
+    | '"' ( ~["\\] | '\\' . )* '"'
     ;
 
+// A bit more permissive, allows more than one symbol
 CHAR
-    : '\'' ( ~['\\] | '\\' . ) '\''
+    : '\'' ( ~['\\] | '\\' . )* '\''
     ;
 
 WS

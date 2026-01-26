@@ -50,13 +50,13 @@ class RonVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by RonParser#IntValue.
-    def visitIntValue(self, ctx:RonParser.IntValueContext):
+    # Visit a parse tree produced by RonParser#FloatValue.
+    def visitFloatValue(self, ctx:RonParser.FloatValueContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by RonParser#FloatValue.
-    def visitFloatValue(self, ctx:RonParser.FloatValueContext):
+    # Visit a parse tree produced by RonParser#IntValue.
+    def visitIntValue(self, ctx:RonParser.IntValueContext):
         return self.visitChildren(ctx)
 
 
