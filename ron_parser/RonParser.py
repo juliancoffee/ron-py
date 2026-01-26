@@ -26,18 +26,18 @@ def serializedATN():
         1,0,0,0,12,70,1,0,0,0,14,74,1,0,0,0,16,85,1,0,0,0,18,99,1,0,0,0,
         20,103,1,0,0,0,22,117,1,0,0,0,24,25,3,2,1,0,25,26,5,0,0,1,26,1,1,
         0,0,0,27,38,3,4,2,0,28,38,3,6,3,0,29,38,3,16,8,0,30,38,3,20,10,0,
-        31,38,3,22,11,0,32,38,5,15,0,0,33,38,5,14,0,0,34,38,5,12,0,0,35,
-        38,5,13,0,0,36,38,5,16,0,0,37,27,1,0,0,0,37,28,1,0,0,0,37,29,1,0,
+        31,38,3,22,11,0,32,38,5,16,0,0,33,38,5,15,0,0,34,38,5,13,0,0,35,
+        38,5,14,0,0,36,38,5,11,0,0,37,27,1,0,0,0,37,28,1,0,0,0,37,29,1,0,
         0,0,37,30,1,0,0,0,37,31,1,0,0,0,37,32,1,0,0,0,37,33,1,0,0,0,37,34,
         1,0,0,0,37,35,1,0,0,0,37,36,1,0,0,0,38,3,1,0,0,0,39,40,5,9,0,0,40,
         41,5,1,0,0,41,42,3,2,1,0,42,43,5,2,0,0,43,46,1,0,0,0,44,46,5,10,
-        0,0,45,39,1,0,0,0,45,44,1,0,0,0,46,5,1,0,0,0,47,53,5,11,0,0,48,50,
+        0,0,45,39,1,0,0,0,45,44,1,0,0,0,46,5,1,0,0,0,47,53,5,12,0,0,48,50,
         5,1,0,0,49,51,3,8,4,0,50,49,1,0,0,0,50,51,1,0,0,0,51,52,1,0,0,0,
         52,54,5,2,0,0,53,48,1,0,0,0,53,54,1,0,0,0,54,7,1,0,0,0,55,58,3,10,
         5,0,56,58,3,14,7,0,57,55,1,0,0,0,57,56,1,0,0,0,58,9,1,0,0,0,59,64,
         3,12,6,0,60,61,5,3,0,0,61,63,3,12,6,0,62,60,1,0,0,0,63,66,1,0,0,
         0,64,62,1,0,0,0,64,65,1,0,0,0,65,68,1,0,0,0,66,64,1,0,0,0,67,69,
-        5,3,0,0,68,67,1,0,0,0,68,69,1,0,0,0,69,11,1,0,0,0,70,71,5,11,0,0,
+        5,3,0,0,68,67,1,0,0,0,68,69,1,0,0,0,69,11,1,0,0,0,70,71,5,12,0,0,
         71,72,5,4,0,0,72,73,3,2,1,0,73,13,1,0,0,0,74,79,3,2,1,0,75,76,5,
         3,0,0,76,78,3,2,1,0,77,75,1,0,0,0,78,81,1,0,0,0,79,77,1,0,0,0,79,
         80,1,0,0,0,80,83,1,0,0,0,81,79,1,0,0,0,82,84,5,3,0,0,83,82,1,0,0,
@@ -73,8 +73,8 @@ class RonParser ( Parser ):
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "SOME", "NONE", "IDENTIFIER", "INTEGER", 
-                      "FLOAT", "STRING", "CHAR", "BOOLEAN", "WS", "COMMENT", 
+                      "<INVALID>", "SOME", "NONE", "BOOLEAN", "IDENTIFIER", 
+                      "INTEGER", "FLOAT", "STRING", "CHAR", "WS", "COMMENT", 
                       "BLOCK_COMMENT" ]
 
     RULE_root = 0
@@ -105,12 +105,12 @@ class RonParser ( Parser ):
     T__7=8
     SOME=9
     NONE=10
-    IDENTIFIER=11
-    INTEGER=12
-    FLOAT=13
-    STRING=14
-    CHAR=15
-    BOOLEAN=16
+    BOOLEAN=11
+    IDENTIFIER=12
+    INTEGER=13
+    FLOAT=14
+    STRING=15
+    CHAR=16
     WS=17
     COMMENT=18
     BLOCK_COMMENT=19
@@ -366,7 +366,7 @@ class RonParser ( Parser ):
                 self.state = 27
                 self.option()
                 pass
-            elif token in [11]:
+            elif token in [12]:
                 localctx = RonParser.StructValueContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
                 self.state = 28
@@ -390,31 +390,31 @@ class RonParser ( Parser ):
                 self.state = 31
                 self.ron_list()
                 pass
-            elif token in [15]:
+            elif token in [16]:
                 localctx = RonParser.CharValueContext(self, localctx)
                 self.enterOuterAlt(localctx, 6)
                 self.state = 32
                 self.match(RonParser.CHAR)
                 pass
-            elif token in [14]:
+            elif token in [15]:
                 localctx = RonParser.StringValueContext(self, localctx)
                 self.enterOuterAlt(localctx, 7)
                 self.state = 33
                 self.match(RonParser.STRING)
                 pass
-            elif token in [12]:
+            elif token in [13]:
                 localctx = RonParser.IntValueContext(self, localctx)
                 self.enterOuterAlt(localctx, 8)
                 self.state = 34
                 self.match(RonParser.INTEGER)
                 pass
-            elif token in [13]:
+            elif token in [14]:
                 localctx = RonParser.FloatValueContext(self, localctx)
                 self.enterOuterAlt(localctx, 9)
                 self.state = 35
                 self.match(RonParser.FLOAT)
                 pass
-            elif token in [16]:
+            elif token in [11]:
                 localctx = RonParser.BoolValueContext(self, localctx)
                 self.enterOuterAlt(localctx, 10)
                 self.state = 36

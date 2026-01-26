@@ -14,5 +14,8 @@ run:
 typecheck:
 	uv run mypy .
 
+test:
+	uv run pytest tests.py
+
 clean:
 	rm -rf ron_parser/*

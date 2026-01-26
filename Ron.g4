@@ -68,8 +68,10 @@ ron_list
 
 // --- Lexer Rules ---
 
+// Keywords must come BEFORE generic Identifiers to win the precedence war
 SOME    : 'Some';
 NONE    : 'None';
+BOOLEAN : 'true' | 'false';
 
 IDENTIFIER
     : [a-zA-Z_] [a-zA-Z0-9_]*
@@ -94,10 +96,6 @@ STRING
 
 CHAR
     : '\'' ( ~['\\] | '\\' . ) '\''
-    ;
-
-BOOLEAN
-    : 'true' | 'false'
     ;
 
 WS
