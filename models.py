@@ -21,14 +21,39 @@ class RonObject:
     v: RonValue
 
     def expect_map(self) -> RonMap:
-        if isinstance(self, RonMap):
-            return self
+        if isinstance(self.v, RonMap):
+            return self.v
         raise ValueError(f"Value '{self}' is not a map")
 
     def expect_struct(self) -> RonStruct:
-        if isinstance(self, RonStruct):
-            return self
+        if isinstance(self.v, RonStruct):
+            return self.v
         raise ValueError(f"Value '{self}' is not a struct")
+
+    def expect_int(self) -> int:
+        if isinstance(self.v, int):
+            return self.v
+        raise ValueError(f"Value '{self}' is not an integer")
+
+    def expect_float(self) -> float:
+        if isinstance(self.v, float):
+            return self.v
+        raise ValueError(f"Value '{self}' is not a float")
+
+    def expect_str(self) -> str:
+        if isinstance(self.v, str):
+            return self.v
+        raise ValueError(f"Value '{self}' is not a string")
+
+    def expect_bool(self) -> bool:
+        if isinstance(self.v, bool):
+            return self.v
+        raise ValueError(f"Value '{self}' is not a boolean")
+
+    def into_option(self) -> "RonObject" | None:
+        if isinstance(self.v, RonOptional):
+            return RonObject(self.v.value) if self.v.value is not None else None
+        raise ValueError(f"Value '{self}' is not an option")
 
     def __getitem__(self, item: str | int) -> "RonObject":
         val = self.v
