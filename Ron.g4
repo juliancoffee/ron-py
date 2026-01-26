@@ -49,7 +49,7 @@ unnamed_fields
 
 // Maps: { key: value, ... }
 ron_map
-    : '{' map_entry (',' map_entry)* ','? '}'
+    : '{' (map_entry (',' map_entry)* ','?)? '}'
     ;
 
 map_entry
@@ -58,7 +58,7 @@ map_entry
 
 // Tuples: (a, b, c)
 ron_tuple
-    : '(' value (',' value)* ','? ')'
+    : '(' (value (',' value)* ','?)? ')'
     ;
 
 // Lists/Vectors: [a, b, c] - RON uses [] for arrays/vectors

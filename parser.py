@@ -1,9 +1,18 @@
+import typing
+
 from antlr4 import CommonTokenStream, InputStream
+from antlr4.error.ErrorListener import ErrorListener
 
 from models import RonObject
 from ron_parser.RonLexer import RonLexer  # type: ignore
 from ron_parser.RonParser import RonParser  # type: ignore
 from visitor import RonConverter
+
+
+class RonErrorListener(ErrorListener):
+    @typing.override
+    def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
+        raise ValueError(f"RON Syntax Error at line {line}:{column} -> {msg}")
 
 
 class RonSyntaxError(Exception):
@@ -12,7 +21,7 @@ class RonSyntaxError(Exception):
 
 def parse_ron(data: str) -> RonObject:
     """
-    Парсить рядок у форматі RON і повертає структуру Python об'єктів.
+    Parses the string and returns a RON object.
     """
     input_stream = InputStream(data)
     lexer = RonLexer(input_stream)

@@ -52,6 +52,16 @@ class RonObject:
             return self.v
         raise ValueError(f"Value '{self}' is not a boolean")
 
+    def expect_tuple(self) -> RonTuple:
+        if isinstance(self.v, RonTuple):
+            return self.v
+        raise ValueError(f"Value '{self}' is not a ron tuple")
+
+    def expect_list(self) -> tuple[RonValue]:
+        if isinstance(self.v, tuple):
+            return self.v
+        raise ValueError(f"Value '{self}' is not a tuple")
+
     def into_option(self) -> "RonObject" | None:
         if isinstance(self.v, RonOptional):
             return RonObject(self.v.value) if self.v.value is not None else None
