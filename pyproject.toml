@@ -12,3 +12,8 @@ dependencies = [
 dev = [
     "antlr4-tools>=0.2.2",
 ]
+
+[tool.basedpyright]
+typeCheckingMode = 'off'
+reportImplicitOverride = true
+reportIncompatibleMethodOverride = true
