@@ -6,14 +6,23 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "antlr4-python3-runtime>=4.13.2",
+    "types-antlr4-python3-runtime>=4.13.0.20251118",
 ]
 
 [dependency-groups]
 dev = [
     "antlr4-tools>=0.2.2",
+    "mypy>=1.19.1",
 ]
 
 [tool.basedpyright]
 typeCheckingMode = 'off'
 reportImplicitOverride = true
 reportIncompatibleMethodOverride = true
+ignore = ["visitor.py"]
+
+[tool.mypy]
+exclude = ["ron_parser/"]
+python_version = 3.14
+warn_unused_configs = true
+check_untyped_defs = true
