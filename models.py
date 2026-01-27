@@ -99,7 +99,7 @@ class RonObject:
 @dataclass(frozen=True)
 class RonStruct:
     name: str
-    _fields: frozendict[str, RonValue] | list[RonValue]
+    _fields: frozendict[str, RonValue] | tuple[RonValue]
 
     @property
     def as_dict(self) -> frozendict[str, RonValue]:
