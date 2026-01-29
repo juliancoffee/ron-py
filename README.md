@@ -9,11 +9,16 @@ because I wanted to write some scripts against RON files, and couldn't find anyt
 
 # installation
 your package manager should be able to install from git, I'll publish it on PyPi at some point
+```bash
+uv add git+https://github.com/juliancoffee/ron-py
+```
 
 # how to use
 There's `FromRonMixin` which gives you `from_ron` method.
 
-Or there's more low-level API if that's your thing
+Or there's more low-level API if that's your thing.
+
+Check out tests and main.py in the root.
 
 # limitations
 doesn't support extensions, yet
