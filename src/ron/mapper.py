@@ -6,15 +6,17 @@ from frozendict import frozendict
 
 from ron.models import (
     RonChar,
+    RonMap,
     RonObject,
     RonOptional,
     RonStruct,
     RonTuple,
     RonValue,
 )
+from ron.parser import parse_ron
 
 
-def convert_ron[T](
+def from_ron[T](
     ron_val: RonObject | RonValue, target_type: typing.Type[T]
 ) -> T:
     """
@@ -39,7 +41,7 @@ def convert_ron[T](
                     inner_type = next(
                         t for t in target_args if t is not type(None)
                     )
-                    return convert_ron(v, inner_type)
+                    return from_ron(v, inner_type)
 
     # 2) Turn RonStruct into target's subclass
     #
@@ -47,7 +49,7 @@ def convert_ron[T](
     if isinstance(ron_val, RonStruct) and not is_dataclass(target_type):
         for subclass in target_type.__subclasses__():
             if subclass.__name__ == ron_val.name:
-                return convert_ron(ron_val, subclass)
+                return from_ron(ron_val, subclass)
         raise ValueError(
             f"No subclass found for {ron_val.name} in {target_type}"
         )
@@ -61,7 +63,7 @@ def convert_ron[T](
                 f"Expected RonStruct for {target_type}, got {type(ron_val)}"
             )
 
-        if ron_val.name != target_type.__name__:
+        if ron_val.name is not None and ron_val.name != target_type.__name__:
             raise ValueError(
                 f"Name mismatch: RON '{ron_val.name}' vs Class '{target_type.__name__}'"
             )
@@ -74,7 +76,7 @@ def convert_ron[T](
             # struct's field
             for field in dataclasses.fields(target_type):
                 if field.name in ron_val._fields:
-                    kwargs[field.name] = convert_ron(
+                    kwargs[field.name] = from_ron(
                         ron_val._fields[field.name],
                         field_hints[field.name],
                     )
@@ -84,7 +86,7 @@ def convert_ron[T](
             cls_fields = dataclasses.fields(target_type)
             for i, val in enumerate(ron_val._fields):
                 f_name = cls_fields[i].name
-                kwargs[f_name] = convert_ron(val, field_hints[f_name])
+                kwargs[f_name] = from_ron(val, field_hints[f_name])
             return target_type(**kwargs)
 
     # 4) Turn RonTuple/tuple into sequence target class
@@ -99,21 +101,44 @@ def convert_ron[T](
             case _:
                 raise RuntimeError(f"can't convert {ron_val} to sequence")
 
+        return target_origin(from_ron(item, item_type) for item in source_data)
+
+    # 5) Turn RonMap into dict target class
+    if target_origin in (dict, typing.Mapping):
+        key_type = target_args[0]
+        item_type = target_args[1]
+
+        assert isinstance(ron_val, RonMap), "can't convert {ron_val} to mapping"
+        source_map = ron_val.entries.items()
+
         return target_origin(
-            convert_ron(item, item_type) for item in source_data
+            (from_ron(key, key_type), from_ron(item, item_type))
+            for (key, item) in source_map
         )
 
-    # 5) Turn primitives
+    # 6) Turn primitives
     match ron_val:
         case RonChar(value):
             assert target_type is str, (
-                f"tried to convert {ron_val} to {target_type}"
+                f"tried to convert {ron_val!r} to {target_type}"
             )
             return typing.cast(T, value)
         case int() | float() | str() | bool():
             assert target_type in (int, float, str, bool), (
-                f"tried to convert {ron_val} to {target_type}"
+                f"tried to convert {ron_val!r} to {target_type}"
             )
             return typing.cast(T, ron_val)
         case other_val:
             raise RuntimeError(f"unexpected {other_val} to {target_type}")
+
+
+class FromRonMixin:
+    """
+    Mixin that adds a capability to load a class from RON string
+    """
+
+    @classmethod
+    def from_ron(cls, ron_string: str) -> typing.Self:
+        parsed = parse_ron(ron_string)
+        res = from_ron(parsed, cls)
+        return res

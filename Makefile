@@ -26,7 +26,7 @@ typecheck:
 	uv run mypy .
 
 test:
-	uv run pytest
+	uv run pytest -vv
 
 fullcheck:
 	$(MAKE) typecheck && \
