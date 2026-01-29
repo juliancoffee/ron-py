@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any, TypeGuard
 
 from frozendict import frozendict
 
@@ -16,6 +17,31 @@ type RonValue = (
     | bool
     | tuple["RonValue", ...]
 )
+
+
+def is_ron_value(val: Any) -> TypeGuard[RonValue]:
+    # simple top-level check
+    if isinstance(
+        val,
+        (
+            RonStruct,
+            RonTuple,
+            RonMap,
+            RonOptional,
+            RonChar,
+            int,
+            float,
+            str,
+            bool,
+        ),
+    ):
+        return True
+
+    # nested "trust me bro" check
+    if isinstance(val, tuple):
+        return len(val) == 0 or is_ron_value(val[0])
+
+    return False
 
 
 @dataclass
@@ -62,12 +88,15 @@ class RonObject:
             return self.v
         raise ValueError(f"Value '{self}' is not a tuple")
 
-    def into_option(self) -> "RonObject" | None:
+    def maybe(self) -> "RonObject" | None:
+        """
+        Converts Obj(Optional(v)) to Optional(Obj(v))
+        """
         if isinstance(self.v, RonOptional):
             return RonObject(self.v.value) if self.v.value is not None else None
         raise ValueError(f"Value '{self}' is not an option")
 
-    def __getitem__(self, item: str | int) -> "RonObject":
+    def __getitem__(self, item: RonValue) -> "RonObject":
         val = self.v
         container = val
 

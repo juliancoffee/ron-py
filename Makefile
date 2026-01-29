@@ -14,10 +14,6 @@ build:
 		Ron.g4
 	@echo ">> making it a module"
 	touch $(generated_dir)/__init__.py
-	@echo ">> post processing"
-	find $(generated_dir) -name "*.py" \
-		-exec sh -c \
-		'echo "# type: ignore" | cat - "{}" > "{}.tmp" && mv "{}.tmp" "{}"' \;
 
 
 run:
@@ -31,6 +27,11 @@ typecheck:
 
 test:
 	uv run pytest
+
+fullcheck:
+	$(MAKE) typecheck && \
+	$(MAKE) test && \
+	$(MAKE) check
 
 clean:
 	rm -rf $(generated_dir)/*

@@ -5,7 +5,7 @@ from antlr4.error.ErrorListener import ErrorListener
 
 from ron._generated.RonLexer import RonLexer  # type: ignore
 from ron._generated.RonParser import RonParser  # type: ignore
-from ron.models import RonObject
+from ron.models import RonObject, is_ron_value
 from ron.visitor import RonConverter
 
 
@@ -37,4 +37,7 @@ def parse_ron(data: str) -> RonObject:
         raise RonSyntaxError("Failed to parse RON data: Syntax Error")
 
     visitor = RonConverter()
-    return RonObject(visitor.visit(tree))
+    val = visitor.visit(tree)  # type: ignore
+    assert is_ron_value(val), f"visitor returned {val} :/"
+
+    return RonObject(val)

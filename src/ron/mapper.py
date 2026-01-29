@@ -106,14 +106,14 @@ def convert_ron[T](
     # 5) Turn primitives
     match ron_val:
         case RonChar(value):
-            assert isinstance(target_type, str), (
+            assert target_type is str, (
                 f"tried to convert {ron_val} to {target_type}"
             )
-            return value
+            return typing.cast(T, value)
         case int() | float() | str() | bool():
-            assert isinstance(target_type, int | float | str | bool), (
+            assert target_type in (int, float, str, bool), (
                 f"tried to convert {ron_val} to {target_type}"
             )
-            return ron_val
+            return typing.cast(T, ron_val)
         case other_val:
-            raise RuntimeError(f"unexpected {other_val}")
+            raise RuntimeError(f"unexpected {other_val} to {target_type}")

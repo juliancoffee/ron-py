@@ -1,6 +1,3 @@
-# type: ignore
-
-
 import pytest
 
 from ron.models import (
@@ -59,11 +56,11 @@ def test_options():
     data = 'Container(item: Some("Sword"), empty: None)'
     obj = parse_ron(data)
 
-    item = obj["item"].into_option()
+    item = obj["item"].maybe()
     assert item is not None
     assert item.expect_str() == "Sword"
 
-    empty = obj["empty"].into_option()
+    empty = obj["empty"].maybe()
     assert empty is None
 
 
@@ -119,7 +116,7 @@ def test_enum_as_key():
     }
     """
     obj = parse_ron(data)
-    entries = obj.v.entries
+    entries = obj.expect_map().entries
 
     red_key = next(
         k
@@ -134,12 +131,12 @@ def test_deeply_nested_key():
     data = '{ Key(zone: "A", id: 1): true }'
 
     obj = parse_ron(data)
-    entry_key = list(obj.v.entries.keys())[0]
+    entry_key = list(obj.expect_map().entries.keys())[0]
 
     assert isinstance(entry_key, RonStruct)
     assert entry_key.name == "Key"
-    assert entry_key._fields["zone"] == "A"
-    assert obj.v.entries[entry_key] is True
+    assert entry_key.as_dict["zone"] == "A"
+    assert obj[entry_key].expect_bool() is True
 
 
 def test_strings_advanced():
@@ -268,10 +265,10 @@ def test_nested_options():
     data = "Some(Some(42))"
     obj = parse_ron(data)
 
-    inner = obj.into_option()
+    inner = obj.maybe()
     assert inner is not None
 
-    val = inner.into_option()
+    val = inner.maybe()
     assert val is not None
     assert val.expect_int() == 42
 
@@ -282,10 +279,10 @@ def test_option_some_none():
     data = "Some(None)"
     obj = parse_ron(data)
 
-    inner = obj.into_option()
+    inner = obj.maybe()
     assert inner is not None
 
-    val = inner.into_option()
+    val = inner.maybe()
     assert val is None
 
     assert obj == RonObject(RonOptional(value=RonOptional(value=None)))
@@ -334,7 +331,7 @@ def test_deep_nesting_complex():
     obj = parse_ron(data)
 
     # Розгортаємо "матрьошку"
-    inner_list = obj.into_option()
+    inner_list = obj.maybe()
     assert inner_list is not None
 
     first_map = inner_list[0]
@@ -350,7 +347,10 @@ def test_deep_nesting_complex():
     )
 
     user = first_map[key]
-    assert user["id"].into_option().expect_int() == 42
+    user_id = user["id"].maybe()
+
+    assert user_id is not None
+    assert user_id.expect_int() == 42
     assert user["tags"][1].expect_str() == "python"
 
 
@@ -361,7 +361,7 @@ def test_empty_with_comments():
     list_data = "[ // порожньо \n ]"
     tuple_data = "( \n /* нічого */ \n )"
 
-    assert len(parse_ron(map_data).v.entries) == 0
+    assert len(parse_ron(map_data).expect_map().entries) == 0
     assert parse_ron(list_data).expect_list() == ()
     assert parse_ron(tuple_data).expect_tuple().elements == ()
 
@@ -372,7 +372,7 @@ def test_no_whitespace_parsing():
     obj = parse_ron(data)
 
     map_part = obj[0]
-    entries = map_part.v.entries
+    entries = map_part.expect_map().entries
     assert 1 in entries
 
     user1 = map_part[1]
@@ -380,8 +380,10 @@ def test_no_whitespace_parsing():
     assert user1["id"].expect_int() == 1
 
     list_part = obj[1]
-    assert list_part[0].into_option().expect_int() == 1
-    assert list_part[1].into_option() is None
+    x = list_part[0].maybe()
+    assert x is not None
+    assert x.expect_int() == 1
+    assert list_part[1].maybe() is None
 
 
 def test_dense_scientific_notation():
