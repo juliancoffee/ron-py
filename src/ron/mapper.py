@@ -1,43 +1,60 @@
+import dataclasses
 import typing
-from dataclasses import fields, is_dataclass
+from dataclasses import is_dataclass
 
 from frozendict import frozendict
 
-from ron.models import RonChar, RonMap, RonOptional, RonStruct, RonTuple
+from ron.models import (
+    RonChar,
+    RonObject,
+    RonOptional,
+    RonStruct,
+    RonTuple,
+    RonValue,
+)
 
 
-def from_ron(ron_val: typing.Any, target_type: typing.Type):
+def convert_ron[T](
+    ron_val: RonObject | RonValue, target_type: typing.Type[T]
+) -> T:
     """
-    Рекурсивно конвертує об'єкти моделей RON у вказаний Python тип.
+    Helper function that converts ... ron types to python types
     """
-    # 1. Обробка Optional[T] (Union[T, None])
-    origin = typing.get_origin(target_type)
-    args = typing.get_args(target_type)
+    if isinstance(ron_val, RonObject):
+        ron_val = ron_val.v
 
-    if origin is typing.Union or (
+    target_origin = typing.get_origin(target_type)
+    target_args = typing.get_args(target_type)
+
+    # 1) Turn RonOptional into Python's Optional[]
+    if target_origin is typing.Union or (
         hasattr(typing, "UnionType")
         and isinstance(target_type, typing.UnionType)
     ):
         if isinstance(ron_val, RonOptional):
-            if ron_val.value is None:
-                return None
-            # Шукаємо в Union тип, який не є None
-            inner_type = next(t for t in args if t is not type(None))
-            return from_ron(ron_val.value, inner_type)
-        if ron_val is None:
-            return None
+            match ron_val.value:
+                case None:
+                    return typing.cast(T, None)
+                case v:
+                    inner_type = next(
+                        t for t in target_args if t is not type(None)
+                    )
+                    return convert_ron(v, inner_type)
 
-    # 2. Обробка "Rust-style" Enum (ієрархія класів)
-    # Якщо прийшла структура, а target_type має підкласи
+    # 2) Turn RonStruct into target's subclass
+    #
+    # Basically, enum handling
     if isinstance(ron_val, RonStruct) and not is_dataclass(target_type):
         for subclass in target_type.__subclasses__():
             if subclass.__name__ == ron_val.name:
-                return from_ron(ron_val, subclass)
+                return convert_ron(ron_val, subclass)
         raise ValueError(
             f"No subclass found for {ron_val.name} in {target_type}"
         )
 
-    # 3. Обробка Dataclasses
+    # 3) Turn RonStruct into target class
+    #
+    # Target type is supposed to be a dataclass
     if is_dataclass(target_type):
         if not isinstance(ron_val, RonStruct):
             raise TypeError(
@@ -52,34 +69,51 @@ def from_ron(ron_val: typing.Any, target_type: typing.Type):
         field_hints = typing.get_type_hints(target_type)
         kwargs = {}
 
-        # Обробка іменованих полів
         if isinstance(ron_val._fields, frozendict):
-            for field in fields(target_type):
+            # if it's a struct with named fields, map every target's field to
+            # struct's field
+            for field in dataclasses.fields(target_type):
                 if field.name in ron_val._fields:
-                    kwargs[field.name] = from_ron(
+                    kwargs[field.name] = convert_ron(
                         ron_val._fields[field.name],
                         field_hints[field.name],
                     )
-        # Обробка неіменованих полів (Tuple Struct)
+            return target_type(**kwargs)
         elif isinstance(ron_val._fields, tuple):
-            cls_fields = fields(target_type)
+            # if it's a struct with unnamed fields, just rely on order
+            cls_fields = dataclasses.fields(target_type)
             for i, val in enumerate(ron_val._fields):
                 f_name = cls_fields[i].name
-                kwargs[f_name] = from_ron(val, field_hints[f_name])
+                kwargs[f_name] = convert_ron(val, field_hints[f_name])
+            return target_type(**kwargs)
 
-        return target_type(**kwargs)
+    # 4) Turn RonTuple/tuple into sequence target class
+    if target_origin in (list, tuple, typing.Sequence):
+        item_type = target_args[0] if target_args else typing.Any
 
-    # 4. Обробка колекцій (list, tuple)
-    if origin in (list, tuple, typing.Sequence):
-        item_type = args[0] if args else typing.Any
-        # RON списки ми зберігаємо як tuple
-        source_data = (
-            ron_val.elements if isinstance(ron_val, RonTuple) else ron_val
+        match ron_val:
+            case RonTuple(elements):
+                source_data = elements
+            case tuple():
+                source_data = ron_val
+            case _:
+                raise RuntimeError(f"can't convert {ron_val} to sequence")
+
+        return target_origin(
+            convert_ron(item, item_type) for item in source_data
         )
-        return origin(from_ron(item, item_type) for item in source_data)
 
-    # 5. Базові типи та примітиви
-    if isinstance(ron_val, RonChar):
-        return ron_val.value
-
-    return ron_val
+    # 5) Turn primitives
+    match ron_val:
+        case RonChar(value):
+            assert isinstance(target_type, str), (
+                f"tried to convert {ron_val} to {target_type}"
+            )
+            return value
+        case int() | float() | str() | bool():
+            assert isinstance(target_type, int | float | str | bool), (
+                f"tried to convert {ron_val} to {target_type}"
+            )
+            return ron_val
+        case other_val:
+            raise RuntimeError(f"unexpected {other_val}")

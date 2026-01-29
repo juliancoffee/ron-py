@@ -1,3 +1,7 @@
+"""
+Example of an API
+"""
+
 from pprint import pprint
 
 from ron.parser import parse_ron

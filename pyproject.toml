@@ -14,6 +14,7 @@ dev = [
     "antlr4-tools>=0.2.2",
     "mypy>=1.19.1",
     "pytest>=9.0.2",
+    "ruff>=0.14.14",
     "types-antlr4-python3-runtime>=4.13.0.20251118",
 ]
 
@@ -28,14 +29,14 @@ build-backend = "hatchling.build"
 typeCheckingMode = 'off'
 reportImplicitOverride = true
 reportIncompatibleMethodOverride = true
-ignore = ["src/ron/visitor.py"]
+ignore = ["src/ron/visitor.py", "src/ron/_generated/"]
 
 [tool.mypy]
-exclude = ["src/ron/ron_parser/"]
+exclude = ["src/ron/_generated/"]
 python_version = 3.14
 warn_unused_configs = true
 check_untyped_defs = true
 
 [tool.ruff]
 line-length = 80
-extend-exclude = ['src/ron/ron_parser/']
+extend-exclude = ['src/ron/_generated/']

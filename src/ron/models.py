@@ -14,7 +14,7 @@ type RonValue = (
     | float
     | str
     | bool
-    | tuple["RonValue"]
+    | tuple["RonValue", ...]
 )
 
 
@@ -57,7 +57,7 @@ class RonObject:
             return self.v
         raise ValueError(f"Value '{self}' is not a ron tuple")
 
-    def expect_list(self) -> tuple[RonValue]:
+    def expect_list(self) -> tuple[RonValue, ...]:
         if isinstance(self.v, tuple):
             return self.v
         raise ValueError(f"Value '{self}' is not a tuple")
@@ -99,10 +99,10 @@ class RonObject:
 @dataclass(frozen=True)
 class RonStruct:
     name: str
-    _fields: frozendict[str, RonValue] | tuple[RonValue]
+    _fields: frozendict[RonValue, RonValue] | tuple[RonValue, ...]
 
     @property
-    def as_dict(self) -> frozendict[str, RonValue]:
+    def as_dict(self) -> frozendict[RonValue, RonValue]:
         """Return dict or die"""
         if isinstance(self._fields, frozendict):
             return self._fields
@@ -111,7 +111,7 @@ class RonStruct:
         )
 
     @property
-    def as_list(self) -> tuple[RonValue]:
+    def as_list(self) -> tuple[RonValue, ...]:
         """Return tuple or die"""
         if isinstance(self._fields, tuple):
             return self._fields
@@ -122,7 +122,7 @@ class RonStruct:
 
 @dataclass(frozen=True)
 class RonTuple:
-    elements: tuple[RonValue]
+    elements: tuple[RonValue, ...]
 
 
 @dataclass(frozen=True)

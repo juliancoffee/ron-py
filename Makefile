@@ -23,6 +23,9 @@ build:
 run:
 	uv run main.py
 
+check:
+	uv run ruff check
+
 typecheck:
 	uv run mypy .
 
