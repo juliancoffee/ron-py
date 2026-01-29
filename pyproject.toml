@@ -3,7 +3,7 @@ name = "ron-py"
 version = "0.1.0"
 description = "Python reader for Rusty Object Notation"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
     "antlr4-python3-runtime>=4.13.2",
     "frozendict>=2.4.7",
