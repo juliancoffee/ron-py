@@ -1,13 +1,20 @@
 # type: ignore
 
 from dataclasses import dataclass
-from parser import parse_ron
 from typing import Optional
 
 import pytest
 
-from mapper import from_ron
-from models import RonChar, RonMap, RonObject, RonOptional, RonStruct, RonTuple
+from ron.mapper import from_ron
+from ron.models import (
+    RonChar,
+    RonMap,
+    RonObject,
+    RonOptional,
+    RonStruct,
+    RonTuple,
+)
+from ron.parser import parse_ron
 
 
 def test_primitives():

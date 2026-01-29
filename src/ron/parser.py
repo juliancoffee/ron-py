@@ -3,10 +3,10 @@ import typing
 from antlr4 import CommonTokenStream, InputStream
 from antlr4.error.ErrorListener import ErrorListener
 
-from models import RonObject
-from ron_parser.RonLexer import RonLexer  # type: ignore
-from ron_parser.RonParser import RonParser  # type: ignore
-from visitor import RonConverter
+from ron._generated.RonLexer import RonLexer  # type: ignore
+from ron._generated.RonParser import RonParser  # type: ignore
+from ron.models import RonObject
+from ron.visitor import RonConverter
 
 
 class RonErrorListener(ErrorListener):

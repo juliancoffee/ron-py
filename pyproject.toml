@@ -17,18 +17,25 @@ dev = [
     "types-antlr4-python3-runtime>=4.13.0.20251118",
 ]
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/ron"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [tool.basedpyright]
 typeCheckingMode = 'off'
 reportImplicitOverride = true
 reportIncompatibleMethodOverride = true
-ignore = ["visitor.py"]
+ignore = ["src/ron/visitor.py"]
 
 [tool.mypy]
-exclude = ["ron_parser/"]
+exclude = ["src/ron/ron_parser/"]
 python_version = 3.14
 warn_unused_configs = true
 check_untyped_defs = true
 
 [tool.ruff]
 line-length = 80
-extend-exclude = ['ron_parser/']
+extend-exclude = ['src/ron/ron_parser/']

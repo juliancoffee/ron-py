@@ -2,9 +2,16 @@ from typing import cast
 
 from frozendict import frozendict
 
-from models import RonChar, RonMap, RonOptional, RonStruct, RonTuple, RonValue
-from ron_parser.RonParser import RonParser  # type: ignore
-from ron_parser.RonVisitor import RonVisitor  # type: ignore
+from ron._generated.RonParser import RonParser  # type: ignore
+from ron._generated.RonVisitor import RonVisitor  # type: ignore
+from ron.models import (
+    RonChar,
+    RonMap,
+    RonOptional,
+    RonStruct,
+    RonTuple,
+    RonValue,
+)
 
 
 class RonConverter(RonVisitor):
@@ -39,7 +46,7 @@ class RonConverter(RonVisitor):
                 key = field.IDENTIFIER().getText()
                 val = cast(RonValue, self.visit(field.value()))
                 fields[key] = val
-            return RonStruct(name=name, _fields=frozendict() | fields)
+            return RonStruct(name=name, _fields=frozendict(fields) | fields)
 
         elif body.unnamed_fields():
             fields_list: list[RonValue] = []

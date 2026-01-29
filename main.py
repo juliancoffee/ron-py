@@ -1,5 +1,6 @@
-from parser import parse_ron
 from pprint import pprint
+
+from ron.parser import parse_ron
 
 ron_data = r"""
 Scene(

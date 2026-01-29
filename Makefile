@@ -1,9 +1,21 @@
 .PHONY: build clean
 
+generated_dir=src/ron/_generated
+
 build:
-	uv run antlr4 -Dlanguage=Python3 -o ron_parser -visitor -no-listener Ron.g4
-	touch ron_parser/__init__.py
-	find ./ron_parser -name "*.py" \
+	@echo ">> cleaning the output directory"
+	rm -rf $(generated_dir)/*
+	@echo ">> generating parser files"
+	uv run antlr4 \
+		-Dlanguage=Python3 \
+		-o $(generated_dir) \
+		-visitor \
+		-no-listener \
+		Ron.g4
+	@echo ">> making it a module"
+	touch $(generated_dir)/__init__.py
+	@echo ">> post processing"
+	find $(generated_dir) -name "*.py" \
 		-exec sh -c \
 		'echo "# type: ignore" | cat - "{}" > "{}.tmp" && mv "{}.tmp" "{}"' \;
 
@@ -15,7 +27,7 @@ typecheck:
 	uv run mypy .
 
 test:
-	uv run pytest tests.py
+	uv run pytest
 
 clean:
-	rm -rf ron_parser/*
+	rm -rf $(generated_dir)/*

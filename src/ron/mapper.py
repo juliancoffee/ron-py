@@ -3,10 +3,10 @@ from dataclasses import fields, is_dataclass
 
 from frozendict import frozendict
 
-from models import RonChar, RonMap, RonOptional, RonStruct, RonTuple
+from ron.models import RonChar, RonMap, RonOptional, RonStruct, RonTuple
 
 
-def from_ron(ron_val: any, target_type: typing.Type):
+def from_ron(ron_val: typing.Any, target_type: typing.Type):
     """
     Рекурсивно конвертує об'єкти моделей RON у вказаний Python тип.
     """
