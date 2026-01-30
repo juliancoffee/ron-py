@@ -96,8 +96,6 @@ def from_ron[T](
         match ron_val:
             case RonSeq(elements):
                 source_data = elements
-            case tuple():
-                source_data = ron_val
             case _:
                 raise RuntimeError(f"can't convert {ron_val} to sequence")
 
@@ -123,7 +121,7 @@ def from_ron[T](
                 f"tried to convert {ron_val!r} to {target_type}"
             )
             return typing.cast(T, value)
-        case int() | float() | str() | bool():
+        case bool() | int() | float() | str():
             assert target_type in (int, float, str, bool), (
                 f"tried to convert {ron_val!r} to {target_type}"
             )
