@@ -104,7 +104,7 @@ def test_struct_as_key():
 
     keys = list(raw_map.entries.keys())
     target_key = keys[0]
-    assert target_key == RonStruct("UserID", (123,))
+    assert target_key == RonStruct("UserID", (123,), spans=None)
     assert raw_map.entries[target_key] == "Admin"
 
 
@@ -240,8 +240,12 @@ def test_anon_struct():
     """)
     struct = obj.expect_struct()
     assert struct.name is None
-    assert struct.as_dict["a"] == RonStruct("Item", ("path.to.item",))
-    assert struct.as_dict["b"] == RonStruct("Item", ("path.to.other.item",))
+    assert struct.as_dict["a"] == RonStruct(
+        "Item", ("path.to.item",), spans=None
+    )
+    assert struct.as_dict["b"] == RonStruct(
+        "Item", ("path.to.other.item",), spans=None
+    )
     assert len(struct._fields) == 2
 
 

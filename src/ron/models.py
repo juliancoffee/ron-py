@@ -36,10 +36,6 @@ def is_ron_value(val: Any) -> TypeGuard[RonValue]:
     ):
         return True
 
-    # nested "trust me bro" check
-    if isinstance(val, tuple):
-        return len(val) == 0 or is_ron_value(val[0])
-
     return False
 
 
@@ -127,7 +123,7 @@ class RonObject:
                 case RonSeq():
                     item = RonSeq(elements=item, kind="tuple")
                 case RonStruct(name):
-                    item = RonStruct(name, _fields=item)
+                    item = RonStruct(name, _fields=item, spans=None)
                 case _:
                     raise TypeError(f"{self}[{item}]: Unexpected index type")
         if isinstance(item, list):
@@ -137,13 +133,13 @@ class RonObject:
                 case RonMap():
                     item = RonMap(entries=frozendict(item))
                 case RonStruct(name):
-                    item = RonStruct(name, _fields=frozendict(item))
+                    item = RonStruct(name, _fields=frozendict(item), spans=None)
                 case _:
                     raise TypeError(f"{self}[{item}]: Unexpected index type")
         if type(key) is RonOptional:
             item = RonOptional(item)
         if type(key) is RonStruct and type(item) is str:
-            item = RonStruct(item, _fields=tuple())
+            item = RonStruct(item, _fields=tuple(), spans=None)
         if item is None:
             item = RonOptional(None)
 
@@ -165,9 +161,20 @@ class RonObject:
 
 
 @dataclass(frozen=True)
+class SpanPoint:
+    ch: int
+    line: int
+    column: int
+
+
+type Span = tuple[SpanPoint, SpanPoint]
+
+
+@dataclass(frozen=True)
 class RonStruct:
     name: str | None
     _fields: frozendict[RonValue, RonValue] | tuple[RonValue, ...]
+    spans: frozendict[RonValue, Span] | tuple[Span, ...] | None
 
     @property
     def as_dict(self) -> frozendict[RonValue, RonValue]:

@@ -19,11 +19,11 @@ class RonSyntaxError(Exception):
     pass
 
 
-def parse_ron(data: str) -> RonObject:
+def parse_ron(src_text: str, *, with_spans: bool = False) -> RonObject:
     """
     Parses the string and returns a RON object.
     """
-    input_stream = InputStream(data)
+    input_stream = InputStream(src_text)
     lexer = RonLexer(input_stream)
     stream = CommonTokenStream(lexer)
     # stream.fill()
@@ -36,7 +36,10 @@ def parse_ron(data: str) -> RonObject:
     if parser.getNumberOfSyntaxErrors() > 0:
         raise RonSyntaxError("Failed to parse RON data: Syntax Error")
 
-    visitor = RonConverter()
+    line_index = [0] + [
+        i + 1 for i, char in enumerate(src_text) if char == "\n"
+    ]
+    visitor = RonConverter(with_spans=with_spans, line_index=line_index)
     val = visitor.visit(tree)  # type: ignore
     assert is_ron_value(val), f"visitor returned {val} :/"
 
