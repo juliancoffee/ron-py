@@ -19,10 +19,73 @@ uv add git+https://github.com/juliancoffee/ron-py
 
 # how to use
 There's `FromRonMixin` which gives you `from_ron` method.
+```python
+from dataclasses import dataclass
+from ron import FromRonMixin
 
+@dataclass
+class Click(FromRonMixin):
+  x: int
+  y: int
+
+obj = Click.from_ron("Click(x: 10, y: 20)")
+assert isinstance(res1, Click)
+assert res1.x == 10
+```
 Or there's more low-level API if that's your thing.
+```python
+from ron import parse_ron
+from ron.models import RonStruct
 
-Check out tests and main.py in the root.
+def test_struct_as_key():
+    data = r"""
+    {
+        UserID(123): "Admin",
+        UserID(456): "Guest"
+    }
+    """
+    # yes, you can just parse it to raw object
+    obj = parse_ron(data)
+
+    # type-narrow it
+    raw_map = obj.expect_map()
+    assert len(raw_map.entries) == 2
+
+    keys = list(raw_map.entries.keys())
+    target_key = keys[0]
+    # or compare to internal types
+    # sneak peek, we also have spans (only for struct field values though, as of now)
+    # use `parse_ron(src, with_spans=True)`
+    assert target_key == RonStruct("UserID", (123,), spans=None)
+    assert raw_map.entries[target_key] == "Admin"
+```
+Alternatively, there's `__getitem__` implementation, which loses some type strictness, but is super convenient.
+```python
+def test_deep_chaining_nested_structures():
+    ron_str = """
+        Player(
+            stats: { "attributes": [10, 15] },
+            inventory: [ Item(name: "Sword") ]
+        )
+    """
+    obj = parse_ron(ron_str)
+
+    # use a struct like you'd use dict
+    strength = obj["stats"]["attributes"][0]
+    assert strength.expect_int() == 10
+
+    # can be infinitely nested, until you jump out with `expect_*` method
+    weapon = obj["inventory"][0]["name"]
+    assert weapon.expect_str() == "Sword"
+
+def test_unit_struct_lookup():
+    obj = parse_ron('{ King: "Crown" }')
+
+    # or even go bonkers and do this
+    assert obj["King"].expect_str() == "Crown"
+```
+
+Check out tests and main.py in the root for more (and, potentially, more up-to-date examples).
 
 # limitations
 doesn't support extensions, yet
