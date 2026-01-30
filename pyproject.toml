@@ -34,9 +34,10 @@ ignore = ["src/ron/visitor.py", "src/ron/_generated/"]
 
 [tool.mypy]
 exclude = ["src/ron/_generated/"]
-python_version = 3.14
+python_version = 3.12
 warn_unused_configs = true
 check_untyped_defs = true
+warn_unreachable = true
 
 [tool.ruff]
 line-length = 80

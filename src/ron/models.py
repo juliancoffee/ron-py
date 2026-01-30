@@ -95,13 +95,25 @@ class RonObject:
             return RonObject(self.v.value) if self.v.value is not None else None
         raise ValueError(f"Value '{self}' is not an option")
 
-    def __getitem__(self, item: RonValue) -> "RonObject":
+    def __getitem__(
+        self,
+        item: RonValue
+        | tuple[RonValue, ...]
+        | list[RonValue]
+        | dict[Any, Any]
+        | None,
+    ) -> "RonObject":
         val = self.v
 
+        # 1. Pick a proper container (and its key type)
+        key = None
         if isinstance(val, RonStruct):
             container = val._fields
+            if type(container) is frozendict:
+                key = container.key(0)
         elif isinstance(val, RonMap):
             container = val.entries
+            key = container.key(0)
         elif isinstance(val, RonSeq):
             container = val.elements
         elif isinstance(val, tuple):
@@ -109,6 +121,33 @@ class RonObject:
         else:
             raise TypeError(f"{self}[{item}]")
 
+        # 2. Convert index to a proper ron type, if needed
+        if isinstance(item, tuple):
+            match key:
+                case RonSeq():
+                    item = RonSeq(elements=item, kind="tuple")
+                case RonStruct(name):
+                    item = RonStruct(name, _fields=item)
+                case _:
+                    raise TypeError(f"{self}[{item}]: Unexpected index type")
+        if isinstance(item, list):
+            item = RonSeq(elements=tuple(item), kind="list")
+        if isinstance(item, dict):
+            match key:
+                case RonMap():
+                    item = RonMap(entries=frozendict(item))
+                case RonStruct(name):
+                    item = RonStruct(name, _fields=frozendict(item))
+                case _:
+                    raise TypeError(f"{self}[{item}]: Unexpected index type")
+        if type(key) is RonOptional:
+            item = RonOptional(item)
+        if type(key) is RonStruct and type(item) is str:
+            item = RonStruct(item, _fields=tuple())
+        if item is None:
+            item = RonOptional(None)
+
+        # 3. Do the index magic and wrap in RonObject to prolong the chain
         if isinstance(container, frozendict):
             result = container[item]
             return RonObject(result)
@@ -127,7 +166,7 @@ class RonObject:
 
 @dataclass(frozen=True)
 class RonStruct:
-    name: str
+    name: str | None
     _fields: frozendict[RonValue, RonValue] | tuple[RonValue, ...]
 
     @property

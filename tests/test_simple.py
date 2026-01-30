@@ -240,8 +240,8 @@ def test_anon_struct():
     """)
     struct = obj.expect_struct()
     assert struct.name is None
-    assert struct._fields["a"] == RonStruct("Item", ("path.to.item",))
-    assert struct._fields["b"] == RonStruct("Item", ("path.to.other.item",))
+    assert struct.as_dict["a"] == RonStruct("Item", ("path.to.item",))
+    assert struct.as_dict["b"] == RonStruct("Item", ("path.to.other.item",))
     assert len(struct._fields) == 2
 
 
