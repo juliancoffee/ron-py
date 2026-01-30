@@ -1,6 +1,8 @@
 # disclaimer
 i can't guarantee the quality of this software, don't rely on it for anything serious
 
+probably better use it if you want to hack on it, and fork/submit PRs
+
 # what
 a quick thing built with the goal to work with RON (Rust Object Notation) files in pure python
 
@@ -28,7 +30,7 @@ doesn't support extensions, yet
 # contributions
 PRs are probably welcome, I don't expect much in terms of the protocol, just use common sense
 
-Ideally, we'd have some CI running first, though
+we even have CI now :D
 
 # notable mentions
 - https://pypi.org/project/python-ron/ & https://github.com/cswinter/pyron \
@@ -36,3 +38,4 @@ I couldn't install it, and it relies on ron-rs, which doesn't have good support 
 - https://github.com/jasonjmcghee/ron-lsp just because it's cool as heck
 - https://github.com/whiteand/ron-js javascript implementation
 - https://github.com/sorairolake/ron-wasm and wasm bindings, which probably suffer from the same problem as python bindings
+- https://github.com/ron-rs/ron2 ron rewrite to fix the current issues by relying less on serde
