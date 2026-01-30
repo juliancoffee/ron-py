@@ -2,7 +2,7 @@
 i can't guarantee the quality of this software, don't rely on it for anything serious
 
 # what
-a quick thing build with the goal to work with RON (Rust Object Notation) files in pure python
+a quick thing built with the goal to work with RON (Rust Object Notation) files in pure python
 
 https://github.com/ron-rs/ron/issues/306
 
@@ -34,3 +34,4 @@ Ideally, we'd have some CI running first, though
 - https://pypi.org/project/python-ron/ & https://github.com/cswinter/pyron \
 I couldn't install it, and it relies on ron-rs, which doesn't have good support for untyped data. Last I checked, it didn't support many datatype kinds (https://github.com/ron-rs/ron/issues/122).
 - https://github.com/jasonjmcghee/ron-lsp just because it's cool as heck
+- https://github.com/whiteand/ron-js javascript implementation
