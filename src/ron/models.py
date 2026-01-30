@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, TypeGuard
+from typing import Any, Literal, TypeGuard
 
 from frozendict import frozendict
 
 type RonValue = (
     RonStruct
-    | RonTuple
+    | RonSeq
     | RonMap
     | RonOptional
     | RonChar
@@ -15,7 +15,6 @@ type RonValue = (
     | float
     | str
     | bool
-    | tuple["RonValue", ...]
 )
 
 
@@ -25,7 +24,7 @@ def is_ron_value(val: Any) -> TypeGuard[RonValue]:
         val,
         (
             RonStruct,
-            RonTuple,
+            RonSeq,
             RonMap,
             RonOptional,
             RonChar,
@@ -78,15 +77,15 @@ class RonObject:
             return self.v
         raise ValueError(f"Value '{self}' is not a boolean")
 
-    def expect_tuple(self) -> RonTuple:
-        if isinstance(self.v, RonTuple):
+    def expect_tuple(self) -> RonSeq:
+        if isinstance(self.v, RonSeq) and self.v.kind == "tuple":
             return self.v
         raise ValueError(f"Value '{self}' is not a ron tuple")
 
-    def expect_list(self) -> tuple[RonValue, ...]:
-        if isinstance(self.v, tuple):
+    def expect_list(self) -> RonSeq:
+        if isinstance(self.v, RonSeq) and self.v.kind == "list":
             return self.v
-        raise ValueError(f"Value '{self}' is not a tuple")
+        raise ValueError(f"Value '{self}' is not a ron list")
 
     def maybe(self) -> "RonObject" | None:
         """
@@ -98,31 +97,32 @@ class RonObject:
 
     def __getitem__(self, item: RonValue) -> "RonObject":
         val = self.v
-        container = val
 
         if isinstance(val, RonStruct):
-            container = val._fields  # type: ignore
+            container = val._fields
         elif isinstance(val, RonMap):
-            container = val.entries  # type: ignore
-        elif isinstance(val, RonTuple):
+            container = val.entries
+        elif isinstance(val, RonSeq):
             container = val.elements
-
-        result: RonValue
+        elif isinstance(val, tuple):
+            container = val
+        else:
+            raise TypeError(f"{self}[{item}]")
 
         if isinstance(container, frozendict):
-            result = container[item]  # type: ignore
+            result = container[item]
+            return RonObject(result)
         elif isinstance(container, tuple):
             if not isinstance(item, int):
                 raise TypeError(
                     f"List indices must be integers, got {type(item).__name__}"
                 )
             result = container[item]
+            return RonObject(result)
         else:
             raise TypeError(
                 f"Value of type {type(val).__name__} is not subscriptable"
             )
-
-        return RonObject(result)
 
 
 @dataclass(frozen=True)
@@ -140,7 +140,7 @@ class RonStruct:
         )
 
     @property
-    def as_list(self) -> tuple[RonValue, ...]:
+    def as_seq(self) -> tuple[RonValue, ...]:
         """Return tuple or die"""
         if isinstance(self._fields, tuple):
             return self._fields
@@ -150,8 +150,13 @@ class RonStruct:
 
 
 @dataclass(frozen=True)
-class RonTuple:
+class RonSeq:
     elements: tuple[RonValue, ...]
+    kind: Literal["list", "tuple"]
+
+    @property
+    def as_seq(self) -> tuple[RonValue, ...]:
+        return self.elements
 
 
 @dataclass(frozen=True)

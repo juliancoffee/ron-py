@@ -5,8 +5,8 @@ from ron.models import (
     RonMap,
     RonObject,
     RonOptional,
+    RonSeq,
     RonStruct,
-    RonTuple,
 )
 from ron.parser import parse_ron
 
@@ -86,8 +86,8 @@ def test_tuple_as_key():
     keys = list(raw_map.entries.keys())
 
     start_key = keys[0]
-    assert type(start_key) is RonTuple
-    assert start_key == RonTuple((0, 0))
+    assert type(start_key) is RonSeq
+    assert start_key == RonSeq((0, 0), kind="tuple")
     assert raw_map.entries[start_key] == "Start"
 
 
@@ -201,14 +201,14 @@ def test_trailing_commas_and_comments():
 
     assert obj[0].expect_int() == 1
     assert obj[2].expect_int() == 3
-    assert len(obj.expect_list()) == 3
+    assert len(obj.expect_list().as_seq) == 3
 
 
 def test_map_trailing_comma():
     data = r"""
     {
         "a": 1,
-        "b": 2, 
+        "b": 2,
     }
     """
     obj = parse_ron(data)
@@ -217,12 +217,12 @@ def test_map_trailing_comma():
 
 
 def test_empty_structures():
-    assert parse_ron("[]").expect_list() == ()
+    assert parse_ron("[]").expect_list().as_seq == ()
 
     obj = parse_ron("{}")
     assert len(obj.expect_map().entries) == 0
 
-    assert parse_ron("()").expect_tuple() == RonTuple(())
+    assert parse_ron("()").expect_tuple().as_seq == ()
 
     obj = parse_ron("Nothing")
     struct = obj.expect_struct()
@@ -340,7 +340,7 @@ def test_deep_nesting_complex():
     assert isinstance(raw_map, RonMap)
 
     key = list(raw_map.entries.keys())[0]
-    assert isinstance(key, RonTuple)
+    assert isinstance(key, RonSeq)
     assert key.elements == (
         1,
         2,
@@ -362,8 +362,8 @@ def test_empty_with_comments():
     tuple_data = "( \n /* нічого */ \n )"
 
     assert len(parse_ron(map_data).expect_map().entries) == 0
-    assert parse_ron(list_data).expect_list() == ()
-    assert parse_ron(tuple_data).expect_tuple().elements == ()
+    assert parse_ron(list_data).expect_list().as_seq == ()
+    assert parse_ron(tuple_data).expect_tuple().as_seq == ()
 
 
 def test_no_whitespace_parsing():

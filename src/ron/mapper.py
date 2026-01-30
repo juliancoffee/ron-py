@@ -9,8 +9,8 @@ from ron.models import (
     RonMap,
     RonObject,
     RonOptional,
+    RonSeq,
     RonStruct,
-    RonTuple,
     RonValue,
 )
 from ron.parser import parse_ron
@@ -94,7 +94,7 @@ def from_ron[T](
         item_type = target_args[0] if target_args else typing.Any
 
         match ron_val:
-            case RonTuple(elements):
+            case RonSeq(elements):
                 source_data = elements
             case tuple():
                 source_data = ron_val

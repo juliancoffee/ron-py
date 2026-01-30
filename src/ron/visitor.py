@@ -4,14 +4,7 @@ from frozendict import frozendict
 
 from ron._generated.RonParser import RonParser  # type: ignore
 from ron._generated.RonVisitor import RonVisitor  # type: ignore
-from ron.models import (
-    RonChar,
-    RonMap,
-    RonOptional,
-    RonStruct,
-    RonTuple,
-    RonValue,
-)
+from ron.models import RonChar, RonMap, RonOptional, RonSeq, RonStruct, RonValue
 
 
 class RonConverter(RonVisitor):
@@ -72,20 +65,21 @@ class RonConverter(RonVisitor):
             entries[key] = val
         return RonMap(entries=frozendict() | entries)
 
-    def visitTupleValue(self, ctx: RonParser.TupleValueContext) -> RonTuple:
+    def visitTupleValue(self, ctx: RonParser.TupleValueContext) -> RonSeq:
         tuple_ctx = ctx.ron_tuple()
         elements = tuple(
             cast(RonValue, self.visit(v)) for v in tuple_ctx.value()
         )
-        return RonTuple(elements=elements)
+        return RonSeq(elements=elements, kind="tuple")
 
-    def visitListValue(
-        self, ctx: RonParser.ListValueContext
-    ) -> tuple[RonValue, ...]:
+    def visitListValue(self, ctx: RonParser.ListValueContext) -> RonSeq:
         list_ctx = ctx.ron_list()
         if not list_ctx.value():
-            return tuple()
-        return tuple(cast(RonValue, self.visit(v)) for v in list_ctx.value())
+            return RonSeq(elements=tuple(), kind="list")
+        return RonSeq(
+            tuple(cast(RonValue, self.visit(v)) for v in list_ctx.value()),
+            kind="list",
+        )
 
     def visitIntValue(self, ctx: RonParser.IntValueContext) -> int:
         return int(ctx.getText(), 0)
