@@ -1,0 +1,23 @@
+name: Ruff
+
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Run Ruff
+        uses: astral-sh/ruff-action@v1
+        with:
+          args: check
+
+      - name: Run Ruff Format
+        uses: astral-sh/ruff-action@v1
+        with:
+          args: format --check
+
+      - name: Status
+        run: echo "${{ job.status }}"
