@@ -1,5 +1,5 @@
 [project]
-name = "ron-py"
+name = "ron-python"
 version = "0.0.1"
 description = "Python reader for Rusty Object Notation"
 readme = "README.md"
