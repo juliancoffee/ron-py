@@ -28,10 +28,17 @@ jobs:
       - name: Determine Destination Directory
         id: dest_dir
         run: |
+          PYPROJECT_VERSION=$(yq '.project.version' pyproject.toml)
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "DIR=dev" >> $GITHUB_OUTPUT
           else
-            echo "DIR=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+            TAG=${GITHUB_REF_NAME#v}
+            if [[ "$TAG" != "$PYPROJECT_VERSION" ]]
+            then
+              echo "::error::Tag ($TAG) != pyproject.toml ($PYPROJECT_VERSION)"
+              exit 1
+            fi
+            echo "DIR=${PYPROJECT_VERSION}" >> $GITHUB_OUTPUT
           fi
 
       - name: Build docs
