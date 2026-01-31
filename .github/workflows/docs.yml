@@ -1,0 +1,81 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.7"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Determine Destination Directory
+        id: dest_dir
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "DIR=dev" >> $GITHUB_OUTPUT
+          else
+            echo "DIR=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build docs
+        run: uv run pdoc ron -o docs
+
+      # deploy docs (dev or versioned)
+      - name: Deploy Versioned Docs
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs
+          target-folder: ${{ steps.dest_dir.outputs.DIR }}
+
+      # copy latest release docs to corresponding
+      - name: Deploy Latest
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs
+          target-folder: latest
+
+      # add index file with redirect to master docs
+      - name: Generate Root Redirect
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p redirect_tmp
+          cat <<EOF > redirect_tmp/index.html
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta http-equiv="refresh" content="0; url=dev/">
+              <title>Redirecting...</title>
+          </head>
+          <body>
+              <p>Redirecting to <a href="dev/">latest development docs</a>...</p>
+          </body>
+          </html>
+          EOF
+
+      - name: Deploy Root Redirect
+        if: github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: redirect_tmp
+          target-folder: .
+          # we want to just add the file, and keep everything else intact
+          clean: false
