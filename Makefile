@@ -26,7 +26,10 @@ typecheck:
 	uv run mypy .
 
 test:
-	uv run pytest -vv
+	uv run pytest -vv --doctest-modules
+
+docs:
+	uv run pdoc ron
 
 fullcheck:
 	$(MAKE) typecheck && \

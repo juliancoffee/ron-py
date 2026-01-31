@@ -21,7 +21,7 @@ class RonSyntaxError(Exception):
 
 def parse_ron(src_text: str, *, with_spans: bool = False) -> RonObject:
     """
-    Parses the string and returns a RON object.
+    Parses the string and returns a `ron.models.RonObject`.
     """
     input_stream = InputStream(src_text)
     lexer = RonLexer(input_stream)

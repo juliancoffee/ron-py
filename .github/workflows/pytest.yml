@@ -22,8 +22,5 @@ jobs:
       - name: Regenerate the parser
         run: make build
 
-      - name: Install the project
-        run: uv sync --all-extras --dev
-
       - name: Run tests
-        run: uv run pytest
+        run: make test
