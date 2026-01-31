@@ -20,7 +20,22 @@ def from_ron[T](
     ron_val: RonObject | RonValue, target_type: typing.Type[T]
 ) -> T:
     """
-    Helper function that converts ... ron types to python types
+    Function you can use to convert your `ron.models.RonObject` or
+    `ron.models.RonValue` into your specific dataclass.
+
+    >>> from dataclasses import dataclass
+    >>> from ron import from_ron, parse_ron
+    >>> @dataclass
+    ... class Point:
+    ...     x: int
+    ...     y: int
+    ...
+    >>> obj = parse_ron("(x: 5, y: 13)")
+    >>> point = from_ron(obj, Point)
+    >>> point.x
+    5
+    >>> point.y
+    13
     """
     if isinstance(ron_val, RonObject):
         ron_val = ron_val.v
@@ -137,6 +152,22 @@ class FromRonMixin:
 
     @classmethod
     def from_ron(cls, ron_string: str) -> typing.Self:
+        """
+        Load your type from a string.
+        >>> from dataclasses import dataclass
+        >>> from ron import FromRonMixin
+        >>>
+        >>> @dataclass
+        ... class Point(FromRonMixin):
+        ...     x: int
+        ...     y: int
+        ...
+        >>> point = Point.from_ron("(x: 5, y: 13)")
+        >>> point.x
+        5
+        >>> point.y
+        13
+        """
         parsed = parse_ron(ron_string)
         res = from_ron(parsed, cls)
         return res

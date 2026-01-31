@@ -26,7 +26,7 @@ def test_list_and_seq_indexing():
     assert obj[2].expect_int() == 300
 
     seq = obj.expect_list()
-    assert len(seq.as_seq) == 3
+    assert len(seq.as_tuple) == 3
 
 
 def test_map_string_lookup():
@@ -138,19 +138,47 @@ def test_unit_struct_lookup():
     assert obj["King"].expect_str() == "Crown"
 
 
-def test_optional_struct_lookup():
+def test_optional_lookup():
     obj = parse_ron('{ Some("King"): "Crown", None: "Hat" }')
 
     assert obj["King"].expect_str() == "Crown"
     assert obj[None].expect_str() == "Hat"
 
 
+def test_optional_struct_lookup():
+    obj = parse_ron('{ Some(King): "Crown", None: "Hat" }')
+
+    # this doesn't quite work, for now
+    # assert obj["King"].expect_str() == "Crown"
+    assert obj[None].expect_str() == "Hat"
+
+
+def test_reversed_optional_lookup():
+    obj = parse_ron('{ None: "Hat", Some("King"): "Crown" }')
+
+    assert obj["King"].expect_str() == "Crown"
+    assert obj[None].expect_str() == "Hat"
+
+
+def test_parsed_optional_struct_lookup():
+    obj = parse_ron('{ Some(King): "Crown", None: "Hat" }')
+
+    assert obj[parse_ron("Some(King)")].expect_str() == "Crown"
+
+
 def test_iteration_lookup():
     # edge case, getitem also implements iter using range() keys
-    # no, we won't support that for maps
     #
+    # and no, we won't support that for maps
     # not now, at least
     obj = parse_ron("[100, 200, 300]")
 
     # yeah, mypy doesn't know about that, which is probably good
     assert [x.expect_int() for x in obj] == [100, 200, 300]  # type: ignore
+
+
+def test_field_iteration_lookup():
+    obj = parse_ron("(x: [100, 200, 300])")
+
+    # yeah, mypy doesn't know about that, which is probably good
+    assert [x.expect_int() for x in obj["x"]] == [100, 200, 300]  # type: ignore

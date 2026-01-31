@@ -26,7 +26,15 @@ typecheck:
 	uv run mypy .
 
 test:
+	uv run pytest -vv \
+		--doctest-modules \
+		src/ron/models.py \
+		src/ron/mapper.py \
+		src/ron/__init__.py
 	uv run pytest -vv
+
+docs:
+	uv run pdoc ron
 
 fullcheck:
 	$(MAKE) typecheck && \

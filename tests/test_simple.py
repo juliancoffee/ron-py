@@ -201,7 +201,7 @@ def test_trailing_commas_and_comments():
 
     assert obj[0].expect_int() == 1
     assert obj[2].expect_int() == 3
-    assert len(obj.expect_list().as_seq) == 3
+    assert len(obj.expect_list().as_tuple) == 3
 
 
 def test_map_trailing_comma():
@@ -217,12 +217,12 @@ def test_map_trailing_comma():
 
 
 def test_empty_structures():
-    assert parse_ron("[]").expect_list().as_seq == ()
+    assert parse_ron("[]").expect_list().as_tuple == ()
 
     obj = parse_ron("{}")
     assert len(obj.expect_map().entries) == 0
 
-    assert parse_ron("()").expect_tuple().as_seq == ()
+    assert parse_ron("()").expect_tuple().as_tuple == ()
 
     obj = parse_ron("Nothing")
     struct = obj.expect_struct()
@@ -366,8 +366,8 @@ def test_empty_with_comments():
     tuple_data = "( \n /* нічого */ \n )"
 
     assert len(parse_ron(map_data).expect_map().entries) == 0
-    assert parse_ron(list_data).expect_list().as_seq == ()
-    assert parse_ron(tuple_data).expect_tuple().as_seq == ()
+    assert parse_ron(list_data).expect_list().as_tuple == ()
+    assert parse_ron(tuple_data).expect_tuple().as_tuple == ()
 
 
 def test_no_whitespace_parsing():
