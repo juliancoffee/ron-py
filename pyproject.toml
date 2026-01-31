@@ -1,6 +1,6 @@
 [project]
 name = "ron-python"
-version = "0.0.1"
+version = "0.0.2"
 description = "Python reader for Rusty Object Notation"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -8,6 +8,12 @@ dependencies = [
     "antlr4-python3-runtime>=4.13.2",
     "frozendict>=2.4.7",
 ]
+
+[project.urls]
+Documentation = "https://juliancoffee.github.io/ron-py/latest/"
+Repository = "https://github.com/juliancoffee/ron-py.git"
+Issues = "https://github.com/juliancoffee/ron-py/issues"
+Releases = "https://github.com/juliancoffee/ron-py/releases"
 
 [dependency-groups]
 dev = [

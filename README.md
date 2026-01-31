@@ -12,12 +12,25 @@ https://github.com/ron-rs/ron/issues/306
 because I wanted to write some scripts against RON files, and couldn't find anything usable, so I threw some code together with gemini and ANTLR4
 
 # installation
-your package manager should be able to install from git, I'll publish it on PyPi at some point
+PyPI link: <https://pypi.org/project/ron-python/>
+```bash
+pip install ron-python
+```
+Or with modern alternative
+```bash
+uv add ron-python
+```
+Or, if you want a development version, feel free to use something like that
 ```bash
 uv add git+https://github.com/juliancoffee/ron-py
 ```
+(I'd recomment to pin it to a specific commit though)
 
 # how to use
+Stable docs: <https://juliancoffee.github.io/ron-py/latest/ron.html>
+
+Main branch docs: <https://juliancoffee.github.io/ron-py/dev/ron.html>
+
 There's `FromRonMixin` which gives you `from_ron` method.
 ```python
 from dataclasses import dataclass
