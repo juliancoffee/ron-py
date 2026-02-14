@@ -1,6 +1,8 @@
 # disclaimer
 i can't guarantee the quality of this software, don't rely on it for anything serious
 
+(also parts of it were made with (or by) gen-AI)
+
 probably better use it if you want to hack on it, and fork/submit PRs
 
 # what
