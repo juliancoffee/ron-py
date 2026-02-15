@@ -161,10 +161,22 @@ class RonConverter(RonVisitor):
                 hash_count += 1
             return raw_text[2 + hash_count : -(1 + hash_count)]
         else:
-            return raw_text[1:-1].encode("utf-8").decode("unicode_escape")
+            # handle escapes like \n and stuff
+            # encode as latin, because otherwise it breaks on utf8 when decoding
+            return (
+                raw_text[1:-1]
+                .encode("latin-1", "backslashreplace")
+                .decode("unicode_escape")
+            )
 
     def visitCharValue(self, ctx: RonParser.CharValueContext) -> RonChar:
         raw_text = ctx.getText()
-        encoded = raw_text[1:-1].encode("utf-8").decode("unicode_escape")
+        # handle escapes like \n and stuff
+        # encode as latin, otherwise it breaks on utf8 when decoding
+        encoded = (
+            raw_text[1:-1]
+            .encode("latin-1", "backslashreplace")
+            .decode("unicode_escape")
+        )
 
         return RonChar(value=encoded)
