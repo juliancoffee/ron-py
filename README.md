@@ -115,5 +115,6 @@ we even have CI now :D
 I couldn't install it, and it relies on ron-rs, which doesn't have good support for untyped data. Last I checked, it didn't support many datatype kinds (https://github.com/ron-rs/ron/issues/122).
 - https://github.com/jasonjmcghee/ron-lsp just because it's cool as heck
 - https://github.com/whiteand/ron-js javascript implementation
+- https://github.com/chriskilding/jackson-dataformat-ron Java Jackson implementation
 - https://github.com/sorairolake/ron-wasm and wasm bindings, which probably suffer from the same problem as python bindings
 - https://github.com/ron-rs/ron2 ron rewrite to fix the current issues by relying less on serde
