@@ -1,6 +1,6 @@
 [project]
 name = "ron-python"
-version = "0.0.2"
+version = "0.0.3"
 description = "Python reader for Rusty Object Notation"
 readme = "README.md"
 requires-python = ">=3.12"

@@ -339,8 +339,8 @@ wheels = [
 ]
 
 [[package]]
-name = "ron-py"
-version = "0.1.0"
+name = "ron-python"
+version = "0.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "antlr4-python3-runtime" },

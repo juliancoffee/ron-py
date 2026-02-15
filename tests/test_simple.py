@@ -396,3 +396,24 @@ def test_dense_scientific_notation():
 
     assert obj["val"].v == -12000.0
     assert obj["next"].v == 0.5
+
+
+def test_cyrillic_encoding():
+    data = '"[{key}] Фонарь"'
+    obj = parse_ron(data)
+
+    assert obj.v == "[{key}] Фонарь"
+
+
+def test_mixed_escapes_and_unicode():
+    data = '"Line 1\\nLine 2: Фонарь"'
+    obj = parse_ron(data)
+
+    assert obj.v == "Line 1\nLine 2: Фонарь"
+
+
+def test_raw_string_handling():
+    data = 'r#"[raw \n string]"#'
+    obj = parse_ron(data)
+
+    assert obj.v == "[raw \n string]"
