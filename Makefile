@@ -6,7 +6,7 @@ build:
 	@echo ">> cleaning the output directory"
 	rm -rf $(generated_dir)/*
 	@echo ">> generating parser files"
-	uv run antlr4 \
+	uv run antlr4 -v 4.13.2 \
 		-Dlanguage=Python3 \
 		-o $(generated_dir) \
 		-visitor \
