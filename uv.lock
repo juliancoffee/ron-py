@@ -340,7 +340,7 @@ wheels = [
 
 [[package]]
 name = "ron-python"
-version = "0.0.1"
+version = "0.0.4"
 source = { editable = "." }
 dependencies = [
     { name = "antlr4-python3-runtime" },
