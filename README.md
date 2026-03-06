@@ -1,36 +1,39 @@
-# disclaimer
-i can't guarantee the quality of this software, don't rely on it for anything serious
+# Disclaimer
+I can't guarantee the quality of this software. Don't rely on it for anything serious.
 
 (also parts of it were made with (or by) gen-AI)
 
-probably better use it if you want to hack on it, and fork/submit PRs
+Ideally, use it if you want to hack on it, fork and/or submit PRs.
 
-# what
-a quick thing built with the goal to work with RON (Rust Object Notation) files in pure python
+# What
+A quick thing built to work with RON (Rust Object Notation) files in pure Python.
 
 https://github.com/ron-rs/ron/issues/306
 
-# why
-because I wanted to write some scripts against RON files, and couldn't find anything usable, so I threw some code together with gemini and ANTLR4
+# Why
+because I wanted to write some scripts against RON files, and couldn't find anything usable, so I threw some code
+together with Gemini and ANTLR4.
 
-# installation
+# Installation
 PyPI link: <https://pypi.org/project/ron-python/>
 ```bash
 pip install ron-python
 ```
-Or with modern alternative
+Or with a modern alternative:
 ```bash
 uv add ron-python
 ```
-Or, if you want a development version, feel free to use something like that
+Or, if you want a development version, feel free to use something like that:
 ```bash
 uv add git+https://github.com/juliancoffee/ron-py
 ```
-(I'd recomment to pin it to a specific commit though)
+I'd recommend pinning it to a specific commit, though:
+```bash
+uv add git+https://github.com/juliancoffee/ron-py.git@8ba6bd6
+```
 
-# how to use
-Stable docs: <https://juliancoffee.github.io/ron-py/latest/ron.html>
-
+# How to use
+Stable docs: <https://juliancoffee.github.io/ron-py/latest/ron.html> \
 Main branch docs: <https://juliancoffee.github.io/ron-py/dev/ron.html>
 
 There's `FromRonMixin` which gives you `from_ron` method.
@@ -59,7 +62,7 @@ def test_struct_as_key():
         UserID(456): "Guest"
     }
     """
-    # yes, you can just parse it to raw object
+    # yes, you can just parse it to a raw object
     obj = parse_ron(data)
 
     # type-narrow it
@@ -102,15 +105,15 @@ def test_unit_struct_lookup():
 
 Check out tests and main.py in the root for more (and, potentially, more up-to-date examples).
 
-# limitations
-doesn't support extensions, yet
+# Limitations
+Doesn't support extensions, yet.
 
-# contributions
+# Contributions
 PRs are probably welcome, I don't expect much in terms of the protocol, just use common sense
 
-we even have CI now :D
+We even have CI now :D
 
-# notable mentions
+# Notable mentions
 - https://pypi.org/project/python-ron/ & https://github.com/cswinter/pyron \
 I couldn't install it, and it relies on ron-rs, which doesn't have good support for untyped data. Last I checked, it didn't support many datatype kinds (https://github.com/ron-rs/ron/issues/122).
 - https://github.com/jasonjmcghee/ron-lsp just because it's cool as heck
